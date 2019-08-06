@@ -5,16 +5,13 @@ using UnityEngine.UI;
 
 public class ScreenManager : MonoBehaviour
 {
-    [SerializeField] Image image=null;
-
-    [SerializeField] Color c_white=Color.white;
-    [SerializeField] Color c_black=Color.black;
-
-    [SerializeField] float fadespeed=0.01f;
-
+    [SerializeField] Image fade = null;
+    public Text daytext;
     public static bool isfinished = false;
     public static bool isfinished2 = false;
-    public GameObject back;
+    [SerializeField] GameObject back =null;
+    [SerializeField] float fadespeed = 0.02f;
+    private Color t_color=Color.black;
 
     public static ScreenManager instance;
     #region Singleton
@@ -32,36 +29,33 @@ public class ScreenManager : MonoBehaviour
     }
     #endregion Singleton
 
-    public IEnumerator Fadeout (bool iswhite)
+    public void dayupdate()
     {
-        Color t_color = (iswhite == true) ? c_white : c_black;
-        t_color.a = 0;
-        image.color = t_color;
+        daytext.text = "Day " + Dialogue.dbplayer.Day_;  
+    }
 
-        while (t_color.a < 1)
-        {
+    public IEnumerator Fadeout() {
+        fade.gameObject.SetActive(true);
+        t_color.a = 0;
+        fade.color = t_color;
+        while (t_color.a < 1) {
             t_color.a += fadespeed;
-            
-            image.color = t_color;
+            fade.color = t_color;
             yield return null;
         }
         isfinished = true;
     }
 
-    public IEnumerator Fadein(bool iswhite)
-    {
-        Color t_color = (iswhite == true) ? c_white : c_black;
+    public IEnumerator Fadein()  {
         t_color.a = 1;
-
-        image.color = t_color;
-
-        while (t_color.a > 0)
-        {
+        fade.color = t_color;
+        while (t_color.a > 0) {
             t_color.a -= fadespeed;
-            image.color = t_color;
+            fade.color = t_color;
             yield return null;
         }
         isfinished = true;
+        fade.gameObject.SetActive(false);
     }
 
     bool Checksamesprite(SpriteRenderer s_spriterenderer, Sprite s_sprite)
@@ -72,8 +66,13 @@ public class ScreenManager : MonoBehaviour
             return false;
     }
 
-    public void SpritechangeCoroutine(string spritename)
+    public IEnumerator SpritechangeCoroutine(string spritename) //배경에 따라 question 글씨 색깔을 바꾸기
     {
+        isfinished = false;
+        fade.gameObject.SetActive(true);
+        StartCoroutine(Fadeout());
+        yield return new WaitUntil(() => isfinished);
+
         SpriteRenderer t_spriteRenderer = back.GetComponent<SpriteRenderer>();
         Sprite t_sprite = Resources.Load("backgrounds/" + spritename, typeof(Sprite)) as Sprite;
 
@@ -81,6 +80,11 @@ public class ScreenManager : MonoBehaviour
         {
             t_spriteRenderer.sprite = t_sprite;
         }
+
+        isfinished = false;
+        StartCoroutine(Fadein());
+        yield return new WaitUntil(() => isfinished);
+        fade.gameObject.SetActive(false);
         isfinished2 = true;
     }
 }

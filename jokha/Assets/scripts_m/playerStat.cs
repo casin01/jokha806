@@ -26,8 +26,6 @@ public class playerStat : MonoBehaviour {
 
     public Text[] showtext = new Text[5];   //스탯 창에 뜨는 스탯    
 
-    public GameObject FloatingText2;
-
     void Start() {
         instance = this;
         stat = dbplayer.Stat;
