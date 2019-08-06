@@ -18,7 +18,13 @@ namespace Dialogue {
         [SerializeField] public bool changeUI;
         [SerializeField] public bool changeimage;
         [SerializeField] public string spritename;
-        public enum fade { d, fadeout, fadein };
+        [SerializeField] public bool roulette;
+        [SerializeField] public bool stop;
+        [SerializeField] public bool perce;
+        [SerializeField] public int [] per;
+        //public enum typ { roul, stop, per};
+        int t, j;
+        int[] range = new int[10];
 
         public void AnswerQuestion(int index) {
             NodePort port = null;
@@ -35,6 +41,7 @@ namespace Dialogue {
                   (connection.node as DialogueBaseNode).Trigger();
               }
             */
+
             NodePort connection;
             if (port.ConnectionCount > 1) {
                 int ran = Random.Range(0, port.ConnectionCount);
@@ -45,6 +52,38 @@ namespace Dialogue {
                 connection = port.GetConnection(0);
             }
             (connection.node as DialogueBaseNode).Trigger();
+        }
+
+
+        public void Randomnode()
+        {
+            t = Random.Range(0, 100);
+            Debug.Log(t.ToString());
+            
+            range[0] = per[0]*10;
+            for (int i = 1; i < (answers.Count - 1); i++)
+            {
+                range[i] = range[i - 1] + per[i]*10;
+            }
+            j = 0;
+
+            while (j < (answers.Count - 1))
+            {
+                if (t < range[j])
+                {
+                    AnswerQuestion(j);
+                    break;
+                }
+                else
+                {
+                    j++;
+                }
+            }
+            if (j == (answers.Count - 1))
+            {
+                AnswerQuestion(j);
+            }
+
         }
 
         public bool hasOutput()

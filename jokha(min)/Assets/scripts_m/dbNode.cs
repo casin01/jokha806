@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Dialogue
 {
@@ -10,15 +11,14 @@ namespace Dialogue
         [System.Serializable]
         public class Choicelist  { public bool[] ch; }
 
-        public static int day=0;
-
         [SerializeField] Choicelist [] c;
         [SerializeField] int[] mycon= new int [1];
+        [SerializeField] static int endnum;
 
-        public bool Greater(int ind, int val)
+        public void startending(int ind, int endn)
         {
-            if (mycon[ind] > val) return true;
-            else return false;
+            endnum = endn;  //엔딩번호
+            SceneManager.LoadScene(ind);
         }
 
     }

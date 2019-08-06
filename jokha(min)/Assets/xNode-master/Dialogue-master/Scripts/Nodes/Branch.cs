@@ -12,12 +12,13 @@ namespace Dialogue {
     public class Branch : DialogueBaseNode {
 
         public Condition[] conditions;
-        public dbplayer player;
 
         [Output] public DialogueBaseNode pass;
         [Output] public DialogueBaseNode fail;
 
         private bool success;
+
+        [SerializeField] [TextArea] string memo;
 
         public override void Trigger() {
             // Perform condition
@@ -34,19 +35,32 @@ namespace Dialogue {
             if (success) port = GetOutputPort("pass");
             else port = GetOutputPort("fail");
             if (port == null) return;
+
+            NodePort connection;
+            if (port.ConnectionCount > 1)
+            {
+                int ran = UnityEngine.Random.Range(0, port.ConnectionCount);
+                connection = port.GetConnection(ran);
+            }
+            else
+            {
+                connection = port.GetConnection(0);
+            }
+            (connection.node as DialogueBaseNode).Trigger();
+
+            /*
             for (int i = 0; i < port.ConnectionCount; i++) {
                 NodePort connection = port.GetConnection(i);
                 (connection.node as DialogueBaseNode).Trigger();
+               
             }
+            */
         }      
 
     }
 
-
-
     [Serializable]
     public class Condition : SerializableCallback<bool>
     {
-        
     }
 }

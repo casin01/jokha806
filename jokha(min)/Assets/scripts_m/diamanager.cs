@@ -26,7 +26,6 @@ public class diamanager : MonoBehaviour
     public GameObject rendererDialogueWindow;
 
     Dialogue.DialogueGraph xdia=null;
-    private diatrigger tri;
     private movecho theChoice;
 
  //   private GameObject listDialogueWindows;
@@ -40,14 +39,16 @@ public class diamanager : MonoBehaviour
     public bool talking = false;
     private bool keyActivated = false;
     private playerStat p;
-    ScreenManager thescreen;
     _Gamemanager gm;
+    ScreenManager thescreen;
+    GameObject roul=null;
+    enum enum1 {d, enddialog, roul, choice, ending };
+    enum1 enddia=enum1.d; 
 
     void Start()
     {
         Name.text = "";
         text.text = "";
-        tri = FindObjectOfType<diatrigger>();     
         //     theAudio = FindObjectOfType<AudioManager>();
         theChoice = FindObjectOfType<movecho>();
         p = FindObjectOfType<playerStat>();
@@ -84,19 +85,33 @@ public class diamanager : MonoBehaviour
 
         animDialogueWindow.SetBool("appear", false);
         talking = false;
-        if (xdia.current.answers.Count != 0)
+
+        switch (enddia)
         {
-            theChoice.triggerChoice(xdia.current);
+            case enum1.roul:    //룰렛
+                if (gm.roul != null)
+                {
+                    roul = gm.roul;
+                    roul.SetActive(true);
+                    StartCoroutine(gm.roul.GetComponent<Roulette>().Roll());
+                }
+                break;
+            case enum1.choice:  //선택지
+                theChoice.triggerChoice(xdia.current);
+                break;
+            case enum1.ending:  //엔딩
+                break;
+            default:
+                gm.changedia();    //대화 끝
+                break;
         }
-        else
-        {
-            gm.changedia();    //대화 끝
-        }
+
+        enddia = 0;
     }
 
     IEnumerator StartDialogueCoroutine()
     {
-        if (xdia.current.changeUI)
+        if (xdia.current.changeUI)  //스탯이 바뀌었을 경우
         {
             for (int i = 0; i < 5; i++)
             {
@@ -104,7 +119,7 @@ public class diamanager : MonoBehaviour
             }
         }
 
-        if (xdia.current.changeimage)
+        if (xdia.current.changeimage)   //배경 이미지 바꾸기
         {
             talking = false;
             animDialogueWindow.SetBool("appear", false);
@@ -118,28 +133,51 @@ public class diamanager : MonoBehaviour
             talking = true;
         }
 
-        if (xdia.current.character.name == "blank")
+        if (xdia.current.perce)
         {
-            Name.text = "";
+            xdia.current.Randomnode();
         }
+
+        if (xdia.current.stop)
+        {
+            yield return new WaitUntil(() => Time.timeScale == 1);
+        }
+
+        if (xdia.current.text == ".")   enddia = enum1.enddialog;
+        else if (xdia.current.roulette)    enddia = enum1.roul;
+        else if (xdia.current.text == "end") enddia = enum1.ending;
+        else    enddia = enum1.d;
+
+        if (enddia > 0)
+        {
+            ExitDialogue();
+        }
+
         else
         {
-            Name.text += xdia.current.character.name;
-        }
-
-        for (int i = 0; i < xdia.current.text.Length; i++)
-        {
-            text.text += xdia.current.text[i]; // 1글자씩 출력.
-            if (i % 7 == 1)
+            if (xdia.current.character.name == "blank")
             {
-                //                theAudio.Play(typeSound);
+                Name.text = "";
             }
-            yield return new WaitForSeconds(0.01f);
+            else
+            {
+                Name.text += xdia.current.character.name;
+            }
+
+            for (int i = 0; i < xdia.current.text.Length; i++)
+            {
+                text.text += xdia.current.text[i]; // 1글자씩 출력.
+                if (i % 7 == 1)
+                {
+                    //                theAudio.Play(typeSound);
+                }
+                yield return new WaitForSeconds(0.01f);
+            }
+            keyActivated = true;
         }
-        keyActivated = true;
     }
 
-    public void displayNextSentence()  {
+    public void displayNextSentence()  {    //continue button
         if (talking && keyActivated)
         {
             keyActivated = false;
@@ -149,18 +187,17 @@ public class diamanager : MonoBehaviour
 
             StopAllCoroutines();
 
-            
-
             if (xdia.current.answers.Count != 0)  {  //선택지
+                enddia = enum1.choice;
                 ExitDialogue();
             }
 
             else  {
-                if (xdia.current.hasOutput())  {
+                if (xdia.current.hasOutput())  {    //대화 진행
                     xdia.AnswerQuestion(0);
                     StartCoroutine(StartDialogueCoroutine());
                 }
-                else  {
+                else  { //대화 끝
                     ExitDialogue();
                 }
             }         

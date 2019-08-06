@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ScreenManager : MonoBehaviour
 {
     [SerializeField] Image fade = null;
-
+    public Text daytext;
     public static bool isfinished = false;
     public static bool isfinished2 = false;
     [SerializeField] GameObject back =null;
@@ -28,6 +28,11 @@ public class ScreenManager : MonoBehaviour
         }
     }
     #endregion Singleton
+
+    public void dayupdate()
+    {
+        daytext.text = "Day " + Dialogue.dbplayer.Day_;  
+    }
 
     public IEnumerator Fadeout() {
         fade.gameObject.SetActive(true);
@@ -61,7 +66,7 @@ public class ScreenManager : MonoBehaviour
             return false;
     }
 
-    public IEnumerator SpritechangeCoroutine(string spritename)
+    public IEnumerator SpritechangeCoroutine(string spritename) //배경에 따라 question 글씨 색깔을 바꾸기
     {
         isfinished = false;
         fade.gameObject.SetActive(true);
