@@ -26,6 +26,7 @@ public class diamanager : MonoBehaviour
     public GameObject rendererDialogueWindow;
 
     Dialogue.DialogueGraph xdia=null;
+    private diatrigger tri;
     private movecho theChoice;
 
  //   private GameObject listDialogueWindows;
@@ -49,6 +50,7 @@ public class diamanager : MonoBehaviour
     {
         Name.text = "";
         text.text = "";
+        tri = FindObjectOfType<diatrigger>();     
         //     theAudio = FindObjectOfType<AudioManager>();
         theChoice = FindObjectOfType<movecho>();
         p = FindObjectOfType<playerStat>();
