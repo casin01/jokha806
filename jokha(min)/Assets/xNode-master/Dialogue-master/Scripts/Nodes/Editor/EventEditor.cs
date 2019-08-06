@@ -13,12 +13,10 @@ namespace DialogueEditor {
             serializedObject.Update();
 
             Dialogue.Event node = target as Dialogue.Event;
-            GUILayout.BeginHorizontal();
             NodeEditorGUILayout.PortField(target.GetInputPort("input"), GUILayout.Width(100));
-            NodeEditorGUILayout.PortField(target.GetOutputPort("output"));
-            GUILayout.EndHorizontal();
             EditorGUILayout.Space();
             NodeEditorGUILayout.PropertyField(serializedObject.FindProperty("trigger"));
+
             serializedObject.ApplyModifiedProperties();
         }
 

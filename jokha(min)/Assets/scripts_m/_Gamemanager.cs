@@ -9,25 +9,27 @@ public class _Gamemanager : MonoBehaviour
     private diamanager dm;
     [SerializeField] Dialogue.DialogueGraph[] nextdialog=null;
     int i = 0;
-    public GameObject roul = null;
-    private ScreenManager sm;
+    public Image image;
+    public GameObject fade;
+    public Text daytext;
 
-    void Start() {
+    void Start()
+    {
+        fade = GameObject.FindWithTag("fadescreen");
         dm = FindObjectOfType<diamanager>();
-        sm = FindObjectOfType<ScreenManager>();
-        sm.dayupdate();
+        daytext.text = "" + Dialogue.dbNode.day;
         dm.setgm(); //게임매니저 불러오기
+        if (fade.GetComponent<Animator>().GetBool("fade"))
+            StartCoroutine(fadeout2());
         dm.changegra(nextdialog[0]);
-        if (roul != null) roul.SetActive(false);
-        i = 0;
-        StartCoroutine(fadeout2());
+        i = 0;    
     }
 
-    IEnumerator fadeout2()  //씬 시작할 때 fade in
+    IEnumerator fadeout2()
     {
-        ScreenManager.isfinished = false;
-        StartCoroutine(sm.Fadein());
-        yield return new WaitUntil(() => ScreenManager.isfinished);
+        fade.GetComponent<Animator>().SetBool("fade", false);
+        yield return new WaitUntil(() => fade.GetComponent<Image>().color.a == 0);
+        fade.SetActive(false);
         yield return new WaitForSeconds(0.5f);
         showdialog();
     }
@@ -56,49 +58,30 @@ public class _Gamemanager : MonoBehaviour
 
     IEnumerator Fadetolevel()
     {
-        ScreenManager.isfinished = false;
-        StartCoroutine(sm.Fadeout());
-        yield return new WaitUntil(() => ScreenManager.isfinished);
+        fade.SetActive(true);
+        fade.GetComponent<Animator>().SetBool("fade", true);
+        yield return new WaitUntil( ()=> fade.GetComponent<Image>().color.a ==1);
         oncomplete();
     }
 
     public void oncomplete()
     {
         //날짜에 따라
-        Dialogue.dbplayer.Day_++;
-        int x = Dialogue.dbplayer.Day_;
-
-        if ((x == 12) || (x == 13)) SceneManager.LoadScene("mtscene");
-        else if (x==18) SceneManager.LoadScene("festival");
-        else if ( (x==2) || (x == 8) || (x == 15) || (x == 22)) //2 8 15 22 day1
-        {
-            SceneManager.LoadScene("Daily1");
-        }
-        else if ((x == 3) || (x == 9) || (x == 16) || (x == 23)) //3 9 16 23 day2
-        {
-            SceneManager.LoadScene("Daily2");
-        }
-        else if ((x == 4) || (x == 10) || (x == 17) || (x == 24)) //4 10 17 24 day3
-        {
-            SceneManager.LoadScene("Daily3");
-        }
-        else if ((x == 5) || (x == 11) || (x == 19) || (x == 25)) //5 11 19 25 26 day4
-        {
-            SceneManager.LoadScene("Daily4");
-        }
-        //엔딩일 경우 메인 씬으로
+        Dialogue.dbNode.day++;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
-    IEnumerator ScreenCoroutine()   //한 대화가 끝나면 fade out & fade in
+    IEnumerator ScreenCoroutine()
     {
-        ScreenManager.isfinished = false;
-        StartCoroutine(sm.Fadeout());
-        yield return new WaitUntil(() => ScreenManager.isfinished);
-
-        ScreenManager.isfinished = false;
-        StartCoroutine(sm.Fadein());
-        yield return new WaitUntil(() => ScreenManager.isfinished);
-
+        if (!fade.GetComponent<Animator>().GetBool("fade"))
+        {
+            fade.SetActive(true);
+            fade.GetComponent<Animator>().SetBool("fade", true);
+            yield return new WaitUntil(() => fade.GetComponent<Image>().color.a == 1);
+        }
+        fade.GetComponent<Animator>().SetBool("fade", false);
+        yield return new WaitUntil(() => fade.GetComponent<Image>().color.a == 0);
+        fade.SetActive(false);
         dm.ShowDialogue();
     }
 }

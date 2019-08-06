@@ -1,12 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class movecho : MonoBehaviour {
     private chomanager theChoice;
     private diamanager dm;
- //   public bool [] flag;    //어떤 선택지를 완료하면 true (보류)
- //   public int i = 0;   //선택지 번호
+    public bool [] flag;
+    public int i = 0;
     Dialogue.Chat cur;
 
     void Start() { 
@@ -16,13 +15,13 @@ public class movecho : MonoBehaviour {
 
     public void triggerChoice(Dialogue.Chat c)  {
         cur = c;
- //       if (!flag[i]) {           
+        if (!flag[i]) {           
             StartCoroutine(ACoroutine());
-   //     }
+        }
     }
 
     IEnumerator ACoroutine()  {
-  //      flag[i++] = true;
+        flag[i++] = true;
         theChoice.ShowChoice(cur);
         yield return new WaitUntil(() => !theChoice.choiceIng);
 

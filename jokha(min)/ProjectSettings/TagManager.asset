@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - fadescreen
+  - Destination
   layers:
   - Default
   - TransparentFX
@@ -14,8 +15,8 @@ TagManager:
   - UI
   - 
   - 
-  - System
-  - Panel
+  - 
+  - 
   - 
   - 
   - 
@@ -41,7 +42,4 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: UI
-    uniqueID: 1468141423
     locked: 0

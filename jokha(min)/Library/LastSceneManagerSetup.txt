@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/Daily3.unity
+- path: Assets/Scenes/MoneyGame2_hj.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
